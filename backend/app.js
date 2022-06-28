@@ -4,9 +4,11 @@ const app = express();
 
 const mongoose = require('mongoose');
 
-const userRoutes = require('./routes/user')
+const userRoutes = require('./routes/user');
 
-var cors = require('cors')
+const sauceRoutes = require('./routes/sauces');
+
+var cors = require('cors');
 app.use(cors())
 
 mongoose.connect('mongodb+srv://Florentin:FloFoot73@clusterp6.blvyy4g.mongodb.net/?retryWrites=true&w=majority',
@@ -18,6 +20,7 @@ mongoose.connect('mongodb+srv://Florentin:FloFoot73@clusterp6.blvyy4g.mongodb.ne
 app.use(express.json());
 
 app.use('/api/auth', userRoutes);
+app.use('/api/sauces', sauceRoutes);
 
 
 module.exports = app;
