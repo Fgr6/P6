@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
+const multer = require('../middleware/multer');
 const auth = require('../middleware/auth');
 const sauceCtrl = require('../controllers/sauce');
 
@@ -8,7 +8,7 @@ const sauceCtrl = require('../controllers/sauce');
 router.post('/', auth, multer, sauceCtrl.createSauce);
 
   /*Affichage des sauces sur la page*/
-router.get('', auth,  sauceCtrl.listeSauce );
+router.get('/', auth,  sauceCtrl.listeSauce );
 
   /*Affichage de la sauce sellectionné via l'id*/
 router.get('/:id', auth, sauceCtrl.pageSauce);
