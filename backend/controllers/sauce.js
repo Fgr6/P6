@@ -69,10 +69,10 @@ exports.likeDislike = (req, res, next) => {
     if(sauce.usersDisliked.indexOf(req.body.userId) == -1 && sauce.usersLiked.indexOf(req.body.userId) == -1) {
       if(req.body.like == 1) {
         sauce.usersLiked.push(req.body.userId);
-        sauce.likes == req.body.like;
+        sauce.likes += req.body.like;
       } else if(req.body.like == -1) {
         sauce.usersDisliked.push(req.body.userId);
-        sauce.dislikes == req.body.like;
+        sauce.dislikes -= req.body.like;
       };
     };
     if(sauce.usersLiked.indexOf(req.body.userId) != -1 && req.body.like == 0) {
