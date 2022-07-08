@@ -64,29 +64,34 @@ exports.suppSauce = (req, res, next) => {
 };
 
 exports.likeDislike = (req, res, next) => {
+  const uId = req.body.userId;
+  const statusLike = req.body.like;
   Sauce.findOne({ _id: req.params.id })
-  .then(sauce => {
-    if(sauce.usersDisliked.indexOf(req.body.userId) == -1 && sauce.usersLiked.indexOf(req.body.userId) == -1) {
-      if(req.body.like == 1) {
-        sauce.usersLiked.push(req.body.userId);
-        sauce.likes += req.body.like;
-      } else if(req.body.like == -1) {
-        sauce.usersDisliked.push(req.body.userId);
-        sauce.dislikes -= req.body.like;
+    .then(Sauce => {
+    if(Sauce.usersDisliked.indexOf(uId) === -1 && Sauce.usersLiked.indexOf(uId) === -1){
+      if(statusLike === 1){
+        Sauce.updateOne({_id:req.params.id},{$inc:{likes:+1},$push:{usersliked:uId}})
+        .then(() => res.status(201).json({message : 'Like Ok' }))
+        .catch(error => res.status(400).json( error ))
+      }else if(statusLike === -1){
+        Sauce.updateOne({_id:req.params.id},{$inc:{dislikes:-1},$push:{usersliked:uId}})
+        .then(() => res.status(201).json({message : 'DisLike Ok' }))
+        .catch(error => res.status(400).json( error ))
       };
     };
-    if(sauce.usersLiked.indexOf(req.body.userId) != -1 && req.body.like == 0) {
-      const indexLikes = sauce.usersLiked.findIndex(user => user === req.body.userId);
-      sauce.usersLiked.splice(indexLikes, 1);
-      sauce.likes == 1;
-    };
-    if(sauce.usersDisliked.indexOf(req.body.userId) != -1 && req.body.like == 0) {
-      const indexLikes = sauce.usersDisliked.findIndex(user => user === req.body.userId);
-      sauce.usersDisliked.splice(indexLikes, 1);
-      sauce.likes == 1;
+    if(statusLike === 0){
+      Sauce.updateOne({_id:req.params.id},{$inc:{likes:-1},$pull:{usersLiked:uId}})
+      .then(() => {
+        return Sauce.updateOne(
+          { _id: req.params.id},
+          { $inc:{dislikes: +1}, $pull:{usersDisliked: uId}}
+        );
+      })
+      .then(() => {
+        res.status(201).json({ message: 'Annulation Ok'})
+      })
+      .catch((error) => res.status(400).json(error));
     }
-    sauce.save();
-    res.status(201).json({ message: 'Like ou Dislike : OK' });
   })
-  .catch(error => res.status(500).json({ error }));
+  .catch(error => res.status(500).json ({ error : "erreur 500" }));
 };
